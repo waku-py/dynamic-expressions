@@ -9,3 +9,10 @@ wheels/
 # Virtual environments
 .venv
 .python-version
+
+# coverage.py
+.coverage
+coverage.xml
+
+# PyCharm
+.idea

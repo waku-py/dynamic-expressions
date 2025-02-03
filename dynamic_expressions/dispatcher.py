@@ -1,6 +1,6 @@
+import functools
 from collections.abc import Mapping, Sequence
 from contextlib import AsyncExitStack
-import functools
 from typing import Any
 
 from dynamic_expressions.extensions import (
