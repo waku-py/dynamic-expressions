@@ -20,14 +20,14 @@ class AllOfNodeSchema[T](NodeSchema[T]):
 
 
 class BinaryExpressionNodeSchema[T](NodeSchema[T]):
-    type: Literal["binary"] = "binary"
+    type: Literal["binary"]
     operator: BinaryExpressionOperator
     left: T
     right: T
 
 
 class LiteralNodeSchema[T](NodeSchema[T]):
-    type: Literal["literal"] = "literal"
+    type: Literal["literal"]
     value: int | str | bool
 
 
