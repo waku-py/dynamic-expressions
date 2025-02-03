@@ -1,7 +1,7 @@
 import abc
 import operator
 from collections.abc import Callable, Mapping
-from typing import TYPE_CHECKING, Any, ClassVar, Protocol
+from typing import Any, ClassVar, Protocol
 
 from dynamic_expressions.nodes import (
     AllOfNode,
@@ -10,11 +10,11 @@ from dynamic_expressions.nodes import (
     LiteralNode,
     Node,
 )
-from dynamic_expressions.types import EmptyContext
+from dynamic_expressions.types import BinaryExpressionOperator, EmptyContext
 
 
 class Dispatch[TContext: EmptyContext](Protocol):
-    async def __call__(self, node: Node, context: TContext) -> Any: ...
+    async def __call__(self, node: Node, context: TContext) -> Any: ...  # noqa: ANN401
 
 
 class Visitor[TNode: Node, TContext: EmptyContext]:
@@ -65,7 +65,9 @@ class AllOfVisitor(Visitor[AllOfNode, EmptyContext]):
 
 
 class BinaryExpressionVisitor(Visitor[BinaryNode, EmptyContext]):
-    operator_mapping: ClassVar[Mapping[str, Callable[[Any, Any], bool]]] = {
+    operator_mapping: ClassVar[
+        Mapping[BinaryExpressionOperator, Callable[[Any, Any], bool]]
+    ] = {
         "=": operator.eq,
         ">": operator.gt,
         ">=": operator.ge,
@@ -98,7 +100,7 @@ class LiteralVisitor(Visitor[LiteralNode, EmptyContext]):
         self,
         *,
         node: LiteralNode,
-        dispatch: Dispatch[EmptyContext],
+        dispatch: Dispatch[EmptyContext],  # noqa: ARG002
         context: EmptyContext,  # noqa: ARG002
     ) -> Any:  # noqa: ANN401
         return node.value

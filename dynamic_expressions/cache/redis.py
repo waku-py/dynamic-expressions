@@ -1,6 +1,6 @@
 from collections.abc import Callable, Sequence
 from datetime import timedelta
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from redis.asyncio import Redis as RedisLib
 
@@ -8,12 +8,10 @@ from dynamic_expressions.cache.base import CacheExtension, CachePolicy
 from dynamic_expressions.nodes import Node
 from dynamic_expressions.types import EmptyContext
 
-
 if TYPE_CHECKING:
     Redis = RedisLib[bytes]
 else:
     Redis = RedisLib
-
 
 
 class RedisCacheExtension[
