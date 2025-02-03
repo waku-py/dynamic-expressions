@@ -1,0 +1,104 @@
+import abc
+import operator
+from collections.abc import Callable, Mapping
+from typing import TYPE_CHECKING, Any, ClassVar, Protocol
+
+from dynamic_expressions.nodes import (
+    AllOfNode,
+    AnyOfNode,
+    BinaryNode,
+    LiteralNode,
+    Node,
+)
+from dynamic_expressions.types import EmptyContext
+
+
+class Dispatch[TContext: EmptyContext](Protocol):
+    async def __call__(self, node: Node, context: TContext) -> Any: ...
+
+
+class Visitor[TNode: Node, TContext: EmptyContext]:
+    @abc.abstractmethod
+    async def visit(
+        self,
+        *,
+        node: TNode,
+        dispatch: Dispatch[TContext],
+        context: TContext,
+    ) -> Any: ...  # noqa: ANN401
+
+
+class AnyOfVisitor(Visitor[AnyOfNode, EmptyContext]):
+    async def visit(
+        self,
+        *,
+        node: AnyOfNode,
+        dispatch: Dispatch[EmptyContext],
+        context: object,
+    ) -> bool:
+        for expr in node.expressions:
+            value = await dispatch(expr, context)
+            if not isinstance(value, bool):
+                msg = f"Invalid return type for node: {expr}"
+                raise TypeError(msg)
+            if value:
+                return True
+        return False
+
+
+class AllOfVisitor(Visitor[AllOfNode, EmptyContext]):
+    async def visit(
+        self,
+        *,
+        node: AllOfNode,
+        dispatch: Dispatch[EmptyContext],
+        context: EmptyContext,
+    ) -> bool:
+        for expr in node.expressions:
+            value = await dispatch(expr, context)
+            if not isinstance(value, bool):
+                msg = f"Invalid return type for node: {expr}"
+                raise TypeError(msg)
+            if not value:
+                return False
+        return True
+
+
+class BinaryExpressionVisitor(Visitor[BinaryNode, EmptyContext]):
+    operator_mapping: ClassVar[Mapping[str, Callable[[Any, Any], bool]]] = {
+        "=": operator.eq,
+        ">": operator.gt,
+        ">=": operator.ge,
+        "<": operator.lt,
+        "<=": operator.le,
+        "!=": operator.ne,
+        "in": operator.contains,
+    }
+
+    async def visit(
+        self,
+        *,
+        node: BinaryNode,
+        dispatch: Dispatch[EmptyContext],
+        context: EmptyContext,
+    ) -> bool:
+        left = await dispatch(node.left, context)
+        right = await dispatch(node.right, context)
+
+        operator_callable = self.operator_mapping.get(node.operator)
+        if operator_callable is None:
+            msg = f"Unknown operator '{node.operator}'"
+            raise ValueError(msg)
+
+        return operator_callable(left, right)
+
+
+class LiteralVisitor(Visitor[LiteralNode, EmptyContext]):
+    async def visit(
+        self,
+        *,
+        node: LiteralNode,
+        dispatch: Dispatch[EmptyContext],
+        context: EmptyContext,  # noqa: ARG002
+    ) -> Any:  # noqa: ANN401
+        return node.value

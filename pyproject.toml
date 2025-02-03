@@ -1,0 +1,17 @@
+[project]
+name = "dynamic-expressions"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pydantic>=2.10.6",
+]
+
+[dependency-groups]
+redis = [
+    "redis[hiredis]>=5.2.1",
+]
+types = [
+    "types-redis>=4.6.0.20241004",
+]
