@@ -75,6 +75,11 @@ class BinaryExpressionVisitor(Visitor[BinaryNode, EmptyContext]):
         "<=": operator.le,
         "!=": operator.ne,
         "in": operator.contains,
+        "+": operator.add,
+        "-": operator.sub,
+        "*": operator.mul,
+        "/": operator.truediv,
+        "//": operator.floordiv,
     }
 
     async def visit(

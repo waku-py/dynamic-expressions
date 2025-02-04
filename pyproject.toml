@@ -13,6 +13,9 @@ cache-redis = [
 serialization-pydantic = [
     "pydantic>=2.10.6",
 ]
+serialization-msgspec = [
+    "msgspec>=0.19.0",
+]
 
 [dependency-groups]
 dev = [

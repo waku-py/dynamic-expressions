@@ -7,20 +7,23 @@ from typing import Any
 
 from dynamic_expressions.extensions import OnVisitExtension
 from dynamic_expressions.nodes import Node
+from dynamic_expressions.serialization import Serializer
 from dynamic_expressions.types import EmptyContext, ExecutionContext
 
 
-@dataclasses.dataclass(slots=True)
+@dataclasses.dataclass(slots=True, kw_only=True)
 class CachePolicy[Context: EmptyContext]:
     types: tuple[type[Node], ...]
     key: Callable[[Node, Context], str]
     ttl: timedelta
+    serializer: Serializer[Any] | None = None
 
 
 class CacheExtension[
     Context: EmptyContext,
 ](OnVisitExtension[Context]):
     policies: Sequence[CachePolicy[Context]]
+    default_serializer: Serializer[Any]
     _policy_cache: MutableMapping[type[Node], CachePolicy[Context] | None]
 
     @contextlib.asynccontextmanager
@@ -38,9 +41,10 @@ class CacheExtension[
             return
 
         key = policy.key(node, provided_context)
+        serializer = policy.serializer or self.default_serializer
         cached_value = await self.get_cache(key)
         if cached_value is not None:
-            execution_context.cache[node] = cached_value
+            execution_context.cache[node] = serializer.deserialize(cached_value)
 
         yield
 
@@ -50,7 +54,7 @@ class CacheExtension[
         ):
             await self.set_cache(
                 key=key,
-                value=execution_context.cache[node],
+                value=serializer.serialize(execution_context.cache[node]),
                 policy=policy,
             )
 
