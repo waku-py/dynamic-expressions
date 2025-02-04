@@ -12,4 +12,6 @@ class ExecutionContext:
     cache: dict[Node, Any] = field(default_factory=dict)
 
 
-BinaryExpressionOperator = Literal["=", ">", ">=", "<", "<=", "!=", "in"]
+BinaryExpressionOperator = Literal[
+    "=", ">", ">=", "<", "<=", "!=", "in", "+", "-", "*", "/", "//"
+]
