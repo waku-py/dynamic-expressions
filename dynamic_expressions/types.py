@@ -13,5 +13,5 @@ class ExecutionContext:
 
 
 BinaryExpressionOperator = Literal[
-    "=", ">", ">=", "<", "<=", "!=", "in", "+", "-", "*", "/", "//"
+    "=", ">", ">=", "<", "<=", "!=", "in", "+", "-", "*", "/", "//", "^",
 ]

@@ -1,16 +1,16 @@
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any
 
-from redis.asyncio import Redis as RedisLib
+from redis.asyncio import Redis
 
 from dynamic_expressions.cache.base import CacheExtension, CachePolicy
 from dynamic_expressions.serialization import Serializer
 from dynamic_expressions.types import EmptyContext
 
 if TYPE_CHECKING:
-    Redis = RedisLib[bytes]
+    RedisClient = Redis[bytes]
 else:
-    Redis = RedisLib
+    RedisClient = Redis
 
 
 class RedisCacheExtension[
@@ -18,7 +18,7 @@ class RedisCacheExtension[
 ](CacheExtension[Context]):
     def __init__(
         self,
-        client: Redis,
+        client: RedisClient,
         policies: Sequence[CachePolicy[Context]],
         default_serializer: Serializer[Any],
     ) -> None:

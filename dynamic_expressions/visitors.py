@@ -38,7 +38,7 @@ class AnyOfVisitor(Visitor[AnyOfNode, EmptyContext]):
     ) -> bool:
         for expr in node.expressions:
             value = await dispatch(expr, context)
-            if not isinstance(value, bool):
+            if not isinstance(value, bool | int):
                 msg = f"Invalid return type for node: {expr}"
                 raise TypeError(msg)
             if value:
@@ -56,7 +56,7 @@ class AllOfVisitor(Visitor[AllOfNode, EmptyContext]):
     ) -> bool:
         for expr in node.expressions:
             value = await dispatch(expr, context)
-            if not isinstance(value, bool):
+            if not isinstance(value, bool | int):
                 msg = f"Invalid return type for node: {expr}"
                 raise TypeError(msg)
             if not value:
@@ -80,6 +80,7 @@ class BinaryExpressionVisitor(Visitor[BinaryNode, EmptyContext]):
         "*": operator.mul,
         "/": operator.truediv,
         "//": operator.floordiv,
+        "^": operator.pow,
     }
 
     async def visit(
@@ -96,7 +97,6 @@ class BinaryExpressionVisitor(Visitor[BinaryNode, EmptyContext]):
         if operator_callable is None:
             msg = f"Unknown operator '{node.operator}'"
             raise ValueError(msg)
-
         return operator_callable(left, right)
 
 

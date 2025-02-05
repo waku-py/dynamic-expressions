@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from dynamic_expressions.types import BinaryExpressionOperator
@@ -30,4 +30,4 @@ class BinaryNode(Node):
 
 @dataclass(slots=True, frozen=True, kw_only=True, unsafe_hash=True)
 class LiteralNode(Node):
-    value: int | str
+    value: Any
