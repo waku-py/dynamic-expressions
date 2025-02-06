@@ -38,9 +38,6 @@ class AnyOfVisitor(Visitor[AnyOfNode, EmptyContext]):
     ) -> bool:
         for expr in node.expressions:
             value = await dispatch(expr, context)
-            if not isinstance(value, bool | int):
-                msg = f"Invalid return type for node: {expr}"
-                raise TypeError(msg)
             if value:
                 return True
         return False
@@ -56,9 +53,6 @@ class AllOfVisitor(Visitor[AllOfNode, EmptyContext]):
     ) -> bool:
         for expr in node.expressions:
             value = await dispatch(expr, context)
-            if not isinstance(value, bool | int):
-                msg = f"Invalid return type for node: {expr}"
-                raise TypeError(msg)
             if not value:
                 return False
         return True
