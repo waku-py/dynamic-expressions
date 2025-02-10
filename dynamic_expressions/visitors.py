@@ -6,7 +6,7 @@ from typing import Any, ClassVar, Protocol
 from dynamic_expressions.nodes import (
     AllOfNode,
     AnyOfNode,
-    BinaryNode,
+    BinaryExpressionNode,
     LiteralNode,
     Node,
 )
@@ -58,7 +58,7 @@ class AllOfVisitor(Visitor[AllOfNode, EmptyContext]):
         return True
 
 
-class BinaryExpressionVisitor(Visitor[BinaryNode, EmptyContext]):
+class BinaryExpressionVisitor(Visitor[BinaryExpressionNode, EmptyContext]):
     operator_mapping: ClassVar[
         Mapping[BinaryExpressionOperator, Callable[[Any, Any], bool]]
     ] = {
@@ -80,7 +80,7 @@ class BinaryExpressionVisitor(Visitor[BinaryNode, EmptyContext]):
     async def visit(
         self,
         *,
-        node: BinaryNode,
+        node: BinaryExpressionNode,
         dispatch: Dispatch[EmptyContext],
         context: EmptyContext,
     ) -> bool:

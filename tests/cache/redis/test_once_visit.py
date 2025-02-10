@@ -3,7 +3,7 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 from dynamic_expressions.dispatcher import VisitorDispatcher
-from dynamic_expressions.nodes import AllOfNode, BinaryNode, LiteralNode
+from dynamic_expressions.nodes import AllOfNode, BinaryExpressionNode, LiteralNode
 from dynamic_expressions.types import EmptyContext
 from dynamic_expressions.visitors import AllOfVisitor
 
@@ -20,7 +20,7 @@ from dynamic_expressions.visitors import AllOfVisitor
         ),
         AllOfNode(
             expressions=(
-                BinaryNode(
+                BinaryExpressionNode(
                     operator="=",
                     left=LiteralNode(value=1),
                     right=LiteralNode(value=1),
@@ -30,14 +30,14 @@ from dynamic_expressions.visitors import AllOfVisitor
         ),
         AllOfNode(
             expressions=(
-                BinaryNode(
+                BinaryExpressionNode(
                     operator="=",
-                    left=BinaryNode(
+                    left=BinaryExpressionNode(
                         operator="=",
                         left=LiteralNode(value=1),
                         right=LiteralNode(value=1),
                     ),
-                    right=BinaryNode(
+                    right=BinaryExpressionNode(
                         operator="=",
                         left=LiteralNode(value=1),
                         right=LiteralNode(value=1),

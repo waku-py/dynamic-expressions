@@ -5,7 +5,12 @@ import pytest
 from dynamic_expressions.cache import CachePolicy
 from dynamic_expressions.cache.redis import RedisCacheExtension, RedisClient
 from dynamic_expressions.dispatcher import VisitorDispatcher
-from dynamic_expressions.nodes import AllOfNode, AnyOfNode, BinaryNode, LiteralNode
+from dynamic_expressions.nodes import (
+    AllOfNode,
+    AnyOfNode,
+    BinaryExpressionNode,
+    LiteralNode,
+)
 from dynamic_expressions.serialization.msgspec import MsgSpecScalarSerializer
 from dynamic_expressions.types import EmptyContext
 from dynamic_expressions.visitors import (
@@ -41,7 +46,7 @@ def dispatcher(redis: RedisClient) -> VisitorDispatcher[EmptyContext]:
         visitors={
             AllOfNode: AllOfVisitor(),
             AnyOfNode: AnyOfVisitor(),
-            BinaryNode: BinaryExpressionVisitor(),
+            BinaryExpressionNode: BinaryExpressionVisitor(),
             LiteralNode: LiteralVisitor(),
         },
         extensions=[
@@ -52,7 +57,7 @@ def dispatcher(redis: RedisClient) -> VisitorDispatcher[EmptyContext]:
                         types=(
                             AllOfNode,
                             AnyOfNode,
-                            BinaryNode,
+                            BinaryExpressionNode,
                             LiteralNode,
                         ),
                         key=lambda node, _: str(hash(node)),

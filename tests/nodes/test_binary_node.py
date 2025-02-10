@@ -1,6 +1,6 @@
 import pytest
 from dynamic_expressions.dispatcher import VisitorDispatcher
-from dynamic_expressions.nodes import BinaryNode, LiteralNode
+from dynamic_expressions.nodes import BinaryExpressionNode, LiteralNode
 from dynamic_expressions.types import EmptyContext
 
 random_numbers: list[LiteralNode] = [
@@ -21,7 +21,7 @@ async def test_add(
     right: LiteralNode,
     dispatcher: VisitorDispatcher[EmptyContext],
 ) -> None:
-    node = BinaryNode(operator="+", left=left, right=right)
+    node = BinaryExpressionNode(operator="+", left=left, right=right)
     assert await dispatcher.visit(node, None) == (left.value + right.value)
 
 
@@ -32,5 +32,5 @@ async def test_eq(
     right: LiteralNode,
     dispatcher: VisitorDispatcher[EmptyContext],
 ) -> None:
-    node = BinaryNode(operator="=", left=left, right=right)
+    node = BinaryExpressionNode(operator="=", left=left, right=right)
     assert await dispatcher.visit(node, None) == (left.value == right.value)

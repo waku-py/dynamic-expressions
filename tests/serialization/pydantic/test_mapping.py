@@ -3,7 +3,7 @@ from typing import Any
 from dynamic_expressions.nodes import (
     AllOfNode,
     AnyOfNode,
-    BinaryNode,
+    BinaryExpressionNode,
     LiteralNode,
 )
 from dynamic_expressions.serialization.pydantic import (
@@ -28,7 +28,7 @@ def test_binary() -> None:
         left=LiteralNodeSchema(type="literal", value=1),
         right=LiteralNodeSchema(type="literal", value=1),
     )
-    node = BinaryNode(
+    node = BinaryExpressionNode(
         operator="+",
         left=LiteralNode(value=1),
         right=LiteralNode(value=1),
@@ -117,14 +117,14 @@ def test_wrapped_schema() -> None:
                 expressions=(
                     AnyOfNode(
                         expressions=(
-                            BinaryNode(
+                            BinaryExpressionNode(
                                 operator="+",
                                 left=LiteralNode(value=1),
                                 right=LiteralNode(value=1),
                             ),
                         ),
                     ),
-                    BinaryNode(
+                    BinaryExpressionNode(
                         operator="+",
                         left=LiteralNode(value=1),
                         right=LiteralNode(value=1),

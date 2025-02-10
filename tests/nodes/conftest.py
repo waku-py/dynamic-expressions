@@ -1,6 +1,11 @@
 import pytest
 from dynamic_expressions.dispatcher import VisitorDispatcher
-from dynamic_expressions.nodes import AllOfNode, AnyOfNode, BinaryNode, LiteralNode
+from dynamic_expressions.nodes import (
+    AllOfNode,
+    AnyOfNode,
+    BinaryExpressionNode,
+    LiteralNode,
+)
 from dynamic_expressions.types import EmptyContext
 from dynamic_expressions.visitors import (
     AllOfVisitor,
@@ -16,7 +21,7 @@ def dispatcher() -> VisitorDispatcher[EmptyContext]:
         visitors={
             AllOfNode: AllOfVisitor(),
             AnyOfNode: AnyOfVisitor(),
-            BinaryNode: BinaryExpressionVisitor(),
+            BinaryExpressionNode: BinaryExpressionVisitor(),
             LiteralNode: LiteralVisitor(),
         },
     )

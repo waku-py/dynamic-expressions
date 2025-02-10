@@ -1,6 +1,6 @@
 import pytest
 from dynamic_expressions.dispatcher import VisitorDispatcher
-from dynamic_expressions.nodes import AnyOfNode, BinaryNode, LiteralNode
+from dynamic_expressions.nodes import AnyOfNode, BinaryExpressionNode, LiteralNode
 from dynamic_expressions.types import EmptyContext
 
 
@@ -16,7 +16,7 @@ from dynamic_expressions.types import EmptyContext
         ),
         AnyOfNode(
             expressions=(
-                BinaryNode(
+                BinaryExpressionNode(
                     operator="=",
                     left=LiteralNode(value=1),
                     right=LiteralNode(value=1),
@@ -26,14 +26,14 @@ from dynamic_expressions.types import EmptyContext
         ),
         AnyOfNode(
             expressions=(
-                BinaryNode(
+                BinaryExpressionNode(
                     operator="=",
-                    left=BinaryNode(
+                    left=BinaryExpressionNode(
                         operator="=",
                         left=LiteralNode(value=1),
                         right=LiteralNode(value=1),
                     ),
-                    right=BinaryNode(
+                    right=BinaryExpressionNode(
                         operator="=",
                         left=LiteralNode(value=1),
                         right=LiteralNode(value=1),
@@ -62,7 +62,7 @@ async def test_positive(
         ),
         AnyOfNode(
             expressions=(
-                BinaryNode(
+                BinaryExpressionNode(
                     operator=">",
                     left=LiteralNode(value=1),
                     right=LiteralNode(value=2),
@@ -72,7 +72,7 @@ async def test_positive(
         ),
         AnyOfNode(
             expressions=(
-                BinaryNode(
+                BinaryExpressionNode(
                     operator="=",
                     left=LiteralNode(value=1),
                     right=LiteralNode(value=2),
@@ -82,14 +82,14 @@ async def test_positive(
         ),
         AnyOfNode(
             expressions=(
-                BinaryNode(
+                BinaryExpressionNode(
                     operator="!=",
-                    left=BinaryNode(
+                    left=BinaryExpressionNode(
                         operator="=",
                         left=LiteralNode(value=1),
                         right=LiteralNode(value=1),
                     ),
-                    right=BinaryNode(
+                    right=BinaryExpressionNode(
                         operator="=",
                         left=LiteralNode(value=1),
                         right=LiteralNode(value=1),

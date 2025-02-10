@@ -7,7 +7,7 @@ from pydantic import BaseModel, ConfigDict, TypeAdapter
 from dynamic_expressions.nodes import (
     AllOfNode,
     AnyOfNode,
-    BinaryNode,
+    BinaryExpressionNode,
     LiteralNode,
     Node,
 )
@@ -45,8 +45,8 @@ class BinaryExpressionNodeSchema[T: NodeSchema](NodeSchema):
     left: T
     right: T
 
-    def to_node(self) -> BinaryNode:
-        return BinaryNode(
+    def to_node(self) -> BinaryExpressionNode:
+        return BinaryExpressionNode(
             operator=self.operator,
             left=self.left.to_node(),
             right=self.right.to_node(),
