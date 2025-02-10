@@ -6,7 +6,7 @@ from typing import Any, ClassVar, Protocol
 from dynamic_expressions.nodes import (
     AllOfNode,
     AnyOfNode,
-    BinaryNode,
+    BinaryExpressionNode,
     LiteralNode,
     Node,
 )
@@ -38,9 +38,6 @@ class AnyOfVisitor(Visitor[AnyOfNode, EmptyContext]):
     ) -> bool:
         for expr in node.expressions:
             value = await dispatch(expr, context)
-            if not isinstance(value, bool):
-                msg = f"Invalid return type for node: {expr}"
-                raise TypeError(msg)
             if value:
                 return True
         return False
@@ -56,15 +53,12 @@ class AllOfVisitor(Visitor[AllOfNode, EmptyContext]):
     ) -> bool:
         for expr in node.expressions:
             value = await dispatch(expr, context)
-            if not isinstance(value, bool):
-                msg = f"Invalid return type for node: {expr}"
-                raise TypeError(msg)
             if not value:
                 return False
         return True
 
 
-class BinaryExpressionVisitor(Visitor[BinaryNode, EmptyContext]):
+class BinaryExpressionVisitor(Visitor[BinaryExpressionNode, EmptyContext]):
     operator_mapping: ClassVar[
         Mapping[BinaryExpressionOperator, Callable[[Any, Any], bool]]
     ] = {
@@ -80,12 +74,13 @@ class BinaryExpressionVisitor(Visitor[BinaryNode, EmptyContext]):
         "*": operator.mul,
         "/": operator.truediv,
         "//": operator.floordiv,
+        "^": operator.pow,
     }
 
     async def visit(
         self,
         *,
-        node: BinaryNode,
+        node: BinaryExpressionNode,
         dispatch: Dispatch[EmptyContext],
         context: EmptyContext,
     ) -> bool:
@@ -96,7 +91,6 @@ class BinaryExpressionVisitor(Visitor[BinaryNode, EmptyContext]):
         if operator_callable is None:
             msg = f"Unknown operator '{node.operator}'"
             raise ValueError(msg)
-
         return operator_callable(left, right)
 
 

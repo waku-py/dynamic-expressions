@@ -1,40 +1,67 @@
+import abc
 from collections.abc import Sequence
 from typing import Any, Literal, Union, overload
 
 from pydantic import BaseModel, ConfigDict, TypeAdapter
 
+from dynamic_expressions.nodes import (
+    AllOfNode,
+    AnyOfNode,
+    BinaryExpressionNode,
+    LiteralNode,
+    Node,
+)
 from dynamic_expressions.types import BinaryExpressionOperator
 
 from ._serialization import Serializer
 
 
-class NodeSchema[T](BaseModel):
+class NodeSchema(BaseModel):
     model_config = ConfigDict(strict=True)
 
+    @abc.abstractmethod
+    def to_node(self) -> Node: ...
 
-class AnyOfNodeSchema[T](NodeSchema[T]):
+
+class AnyOfNodeSchema[T: NodeSchema](NodeSchema):
     type: Literal["any-of"]
     expressions: tuple[T, ...]
 
+    def to_node(self) -> AnyOfNode:
+        return AnyOfNode(expressions=tuple(expr.to_node() for expr in self.expressions))
 
-class AllOfNodeSchema[T](NodeSchema[T]):
+
+class AllOfNodeSchema[T: NodeSchema](NodeSchema):
     type: Literal["all-of"]
     expressions: tuple[T, ...]
 
+    def to_node(self) -> AllOfNode:
+        return AllOfNode(expressions=tuple(expr.to_node() for expr in self.expressions))
 
-class BinaryExpressionNodeSchema[T](NodeSchema[T]):
+
+class BinaryExpressionNodeSchema[T: NodeSchema](NodeSchema):
     type: Literal["binary"]
     operator: BinaryExpressionOperator
     left: T
     right: T
 
+    def to_node(self) -> BinaryExpressionNode:
+        return BinaryExpressionNode(
+            operator=self.operator,
+            left=self.left.to_node(),
+            right=self.right.to_node(),
+        )
 
-class LiteralNodeSchema[T](NodeSchema[T]):
+
+class LiteralNodeSchema[T](NodeSchema):
     type: Literal["literal"]
     value: int | str | bool
 
+    def to_node(self) -> LiteralNode:
+        return LiteralNode(value=self.value)
 
-BUILTIN_SCHEMAS: Sequence[type[NodeSchema[Any]]] = [
+
+BUILTIN_SCHEMAS: Sequence[type[NodeSchema]] = [
     AnyOfNodeSchema,
     AllOfNodeSchema,
     BinaryExpressionNodeSchema,
@@ -43,16 +70,16 @@ BUILTIN_SCHEMAS: Sequence[type[NodeSchema[Any]]] = [
 
 
 class PydanticExpressionParser:
-    def __init__(self, types: Sequence[type[NodeSchema[Any]]]) -> None:
+    def __init__(self, types: Sequence[type[NodeSchema]]) -> None:
         self._types = list(types)
         self._needs_rebuild = True
-        self._type_adapter: TypeAdapter[NodeSchema[Any]] | None = None
+        self._type_adapter: TypeAdapter[NodeSchema] | None = None
 
-    def add_type(self, cls: type[NodeSchema[Any]]) -> None:
+    def add_type(self, cls: type[NodeSchema]) -> None:
         self._types.append(cls)
 
     @property
-    def type_adapter(self) -> TypeAdapter[NodeSchema[Any]]:
+    def type_adapter(self) -> TypeAdapter[NodeSchema]:
         if self._needs_rebuild or self._type_adapter is None:
             union = Union[tuple(model["union"] for model in self._types)]  # type: ignore[valid-type,index]  # noqa: UP007
             self._type_adapter = TypeAdapter(union)
