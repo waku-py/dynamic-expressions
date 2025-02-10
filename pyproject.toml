@@ -1,7 +1,7 @@
 [project]
 name = "dynamic-expressions"
 version = "0.1.0"
-description = "Add your description here"
+description = ""
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = []
@@ -20,6 +20,7 @@ serialization-msgspec = [
 [dependency-groups]
 dev = [
     "anyio>=4.8.0",
+    "commitizen",
     "coverage>=7.6.10",
     "deptry>=0.23.0",
     "mypy>=1.14.1",
@@ -129,3 +130,15 @@ staticmethod-decorators = ["staticmethod"]
 
 [tool.ruff.lint.flake8-tidy-imports]
 ban-relative-imports = "parents"
+
+[tool.commitizen]
+name = "cz_conventional_commits"
+version = "0.1.0"
+tag_format = "$version"
+version_scheme = "pep440"
+version_provider = "pep621"
+major_version_zero = true
+update_changelog_on_bump = true
+version_files = [
+    "pyproject.toml:version",
+]
