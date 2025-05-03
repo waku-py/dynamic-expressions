@@ -9,7 +9,10 @@ from dynamic_expressions.nodes import (
     AllOfNode,
     AnyOfNode,
     BinaryExpressionNode,
+    CaseNode,
+    CoalesceNode,
     LiteralNode,
+    MatchNode,
 )
 from dynamic_expressions.serialization.msgspec import MsgSpecScalarSerializer
 from dynamic_expressions.types import EmptyContext
@@ -17,7 +20,10 @@ from dynamic_expressions.visitors import (
     AllOfVisitor,
     AnyOfVisitor,
     BinaryExpressionVisitor,
+    CaseVisitor,
+    CoalesceVisitor,
     LiteralVisitor,
+    MatchVisitor,
 )
 from testcontainers.redis import AsyncRedisContainer  # type: ignore[import-untyped]
 
@@ -48,6 +54,9 @@ def dispatcher(redis: RedisClient) -> VisitorDispatcher[EmptyContext]:
             AnyOfNode: AnyOfVisitor(),
             BinaryExpressionNode: BinaryExpressionVisitor(),
             LiteralNode: LiteralVisitor(),
+            CoalesceNode: CoalesceVisitor(),
+            CaseNode: CaseVisitor(),
+            MatchNode: MatchVisitor(),
         },
         extensions=[
             RedisCacheExtension(

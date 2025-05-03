@@ -8,7 +8,10 @@ from dynamic_expressions.nodes import (
     AllOfNode,
     AnyOfNode,
     BinaryExpressionNode,
+    CaseNode,
+    CoalesceNode,
     LiteralNode,
+    MatchNode,
     Node,
 )
 from dynamic_expressions.types import BinaryExpressionOperator
@@ -61,11 +64,46 @@ class LiteralNodeSchema[T](NodeSchema):
         return LiteralNode(value=self.value)
 
 
+class CoalesceNodeSchema[T: NodeSchema](NodeSchema):
+    type: Literal["coalesce"]
+    items: tuple[T, ...]
+
+    def to_node(self) -> CoalesceNode:
+        return CoalesceNode(items=tuple(item.to_node() for item in self.items))
+
+
+class CaseNodeSchema[T: NodeSchema](NodeSchema):
+    type: Literal["case"]
+    expression: T
+    value: T
+
+    def to_node(self) -> CaseNode:
+        return CaseNode(
+            expression=self.expression.to_node(),
+            value=self.value.to_node(),
+        )
+
+
+class MatchNodeSchema[T: NodeSchema](NodeSchema):
+    type: Literal["match"]
+    cases: tuple[T, ...]
+    default: T | None = None
+
+    def to_node(self) -> MatchNode:
+        return MatchNode(
+            cases=tuple(case_.to_node() for case_ in self.cases),  # type: ignore[misc]
+            default=self.default.to_node() if self.default else None,
+        )
+
+
 BUILTIN_SCHEMAS: Sequence[type[NodeSchema]] = [
     AnyOfNodeSchema,
     AllOfNodeSchema,
     BinaryExpressionNodeSchema,
     LiteralNodeSchema,
+    CoalesceNodeSchema,
+    CaseNodeSchema,
+    MatchNodeSchema,
 ]
 
 

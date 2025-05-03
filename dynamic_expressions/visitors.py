@@ -7,7 +7,10 @@ from dynamic_expressions.nodes import (
     AllOfNode,
     AnyOfNode,
     BinaryExpressionNode,
+    CaseNode,
+    CoalesceNode,
     LiteralNode,
+    MatchNode,
     Node,
 )
 from dynamic_expressions.types import BinaryExpressionOperator, EmptyContext
@@ -103,3 +106,48 @@ class LiteralVisitor(Visitor[LiteralNode, EmptyContext]):
         context: EmptyContext,  # noqa: ARG002
     ) -> Any:  # noqa: ANN401
         return node.value
+
+
+class CoalesceVisitor(Visitor[CoalesceNode, EmptyContext]):
+    async def visit(
+        self,
+        *,
+        node: CoalesceNode,
+        dispatch: Dispatch[EmptyContext],
+        context: EmptyContext,
+    ) -> Any:  # noqa: ANN401
+        for item in node.items:
+            node_result = await dispatch(item, context)
+            if node_result:
+                return node_result
+        return None
+
+
+class CaseVisitor(Visitor[CaseNode, EmptyContext]):
+    async def visit(
+        self,
+        *,
+        node: CaseNode,  # noqa: ARG002
+        dispatch: Dispatch[EmptyContext],  # noqa: ARG002
+        context: EmptyContext,  # noqa: ARG002
+    ) -> Any:  # noqa: ANN401
+        msg = "Use CaseNode only in MatchNode"
+        raise ValueError(msg)
+
+
+class MatchVisitor(Visitor[MatchNode, EmptyContext]):
+    async def visit(
+        self,
+        *,
+        node: MatchNode,
+        dispatch: Dispatch[EmptyContext],
+        context: EmptyContext,
+    ) -> Any:  # noqa: ANN401
+        for case_ in node.cases:
+            if await dispatch(case_.expression, context):
+                return await dispatch(case_.value, context)
+        if node.default is not None:
+            return await dispatch(node.default, context)
+
+        msg = "MatchCase doesn't find CaseNode with the appropriate expression"
+        raise ValueError(msg)
