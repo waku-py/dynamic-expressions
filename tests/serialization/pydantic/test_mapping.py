@@ -4,13 +4,19 @@ from dynamic_expressions.nodes import (
     AllOfNode,
     AnyOfNode,
     BinaryExpressionNode,
+    CaseNode,
+    CoalesceNode,
     LiteralNode,
+    MatchNode,
 )
 from dynamic_expressions.serialization.pydantic import (
     AllOfNodeSchema,
     AnyOfNodeSchema,
     BinaryExpressionNodeSchema,
+    CaseNodeSchema,
+    CoalesceNodeSchema,
     LiteralNodeSchema,
+    MatchNodeSchema,
 )
 
 
@@ -66,6 +72,60 @@ def test_any_of() -> None:
             LiteralNode(value=True),
             LiteralNode(value=False),
         ),
+    )
+    assert schema.to_node() == node
+
+
+def test_coalesce() -> None:
+    schema = CoalesceNodeSchema[Any](
+        type="coalesce",
+        items=(
+            LiteralNodeSchema(type="literal", value=True),
+            LiteralNodeSchema(type="literal", value=False),
+        ),
+    )
+    node = CoalesceNode(
+        items=(
+            LiteralNode(value=True),
+            LiteralNode(value=False),
+        ),
+    )
+    assert schema.to_node() == node
+
+
+def test_case() -> None:
+    schema = CaseNodeSchema[Any](
+        type="case",
+        expression=LiteralNodeSchema(type="literal", value=True),
+        value=LiteralNodeSchema(type="literal", value=False),
+    )
+    node = CaseNode(
+        expression=LiteralNode(value=True),
+        value=LiteralNode(value=False),
+    )
+    assert schema.to_node() == node
+
+
+def test_match() -> None:
+    schema = MatchNodeSchema[Any](
+        type="match",
+        cases=(
+            CaseNodeSchema[Any](
+                type="case",
+                expression=LiteralNodeSchema(type="literal", value=True),
+                value=LiteralNodeSchema(type="literal", value=False),
+            ),
+        ),
+        default=LiteralNodeSchema(type="literal", value=5),
+    )
+    node = MatchNode(
+        cases=(
+            CaseNode(
+                expression=LiteralNode(value=True),
+                value=LiteralNode(value=False),
+            ),
+        ),
+        default=LiteralNode(value=5),
     )
     assert schema.to_node() == node
 

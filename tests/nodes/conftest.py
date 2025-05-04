@@ -4,14 +4,20 @@ from dynamic_expressions.nodes import (
     AllOfNode,
     AnyOfNode,
     BinaryExpressionNode,
+    CaseNode,
+    CoalesceNode,
     LiteralNode,
+    MatchNode,
 )
 from dynamic_expressions.types import EmptyContext
 from dynamic_expressions.visitors import (
     AllOfVisitor,
     AnyOfVisitor,
     BinaryExpressionVisitor,
+    CaseVisitor,
+    CoalesceVisitor,
     LiteralVisitor,
+    MatchVisitor,
 )
 
 
@@ -23,5 +29,8 @@ def dispatcher() -> VisitorDispatcher[EmptyContext]:
             AnyOfNode: AnyOfVisitor(),
             BinaryExpressionNode: BinaryExpressionVisitor(),
             LiteralNode: LiteralVisitor(),
+            CoalesceNode: CoalesceVisitor(),
+            CaseNode: CaseVisitor(),
+            MatchNode: MatchVisitor(),
         },
     )

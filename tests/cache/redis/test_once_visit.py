@@ -52,7 +52,7 @@ async def test_ok(
     node: AllOfNode,
     dispatcher: VisitorDispatcher[EmptyContext],
 ) -> None:
-    result1 = cast(bool, await dispatcher.visit(node, None))
+    result1 = cast("bool", await dispatcher.visit(node, None))
     with patch.object(
         AllOfVisitor,
         AllOfVisitor.visit.__name__,

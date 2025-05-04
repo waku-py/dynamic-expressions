@@ -34,3 +34,20 @@ class LiteralNode(Node):
 
     def __hash__(self) -> int:
         return hash((self.value, type(self.value)))
+
+
+@dataclass(slots=True, frozen=True, kw_only=True)
+class CoalesceNode(Node):
+    items: tuple[Node, ...]
+
+
+@dataclass(slots=True, frozen=True, kw_only=True)
+class CaseNode(Node):
+    expression: Node
+    value: Node
+
+
+@dataclass(slots=True, frozen=True, kw_only=True)
+class MatchNode(Node):
+    cases: tuple[CaseNode, ...]
+    default: Node | None = None
