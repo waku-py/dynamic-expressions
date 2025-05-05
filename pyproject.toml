@@ -92,7 +92,7 @@ init_forbid_extra = true
 init_typed = true
 
 [tool.ruff]
-src = ["src", "tests"]
+src = ["dynamic_expressions", "tests"]
 [tool.ruff.lint]
 fixable = [
     "F",
