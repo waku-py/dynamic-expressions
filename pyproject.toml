@@ -3,8 +3,15 @@ name = "dynamic-expressions"
 version = "0.1.2"
 description = ""
 readme = "README.md"
+license = { text = "MIT" }
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+]
 requires-python = ">=3.12"
 dependencies = []
+
+[project.urls]
+Repository = "https://github.com/waku-py/dynamic-expressions"
 
 [project.optional-dependencies]
 cache-redis = [
@@ -23,6 +30,9 @@ dev = [
     "commitizen",
     "coverage>=7.6.10",
     "deptry>=0.23.0",
+    "mkdocs>=1.6.1",
+    "mkdocs-material>=9.6.12",
+    "mkdocstrings[python]>=0.29.1",
     "mypy>=1.14.1",
     "pytest>=8.3.4",
     "redis>=5.2.1",
