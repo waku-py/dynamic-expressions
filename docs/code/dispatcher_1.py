@@ -36,7 +36,7 @@ async def main() -> None:
     node = BinaryExpressionNode(
         operator="+",
         left=LiteralNode(value=1),
-        left=LiteralNode(value=2),
+        right=LiteralNode(value=2),
     )
     result = await dispatcher.visit(node, None)
     assert result == 3

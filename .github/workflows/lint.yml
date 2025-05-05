@@ -9,8 +9,8 @@ jobs:
           - "3.12"
         job:
           - mypy .
-          - ruff format --check .
-          - ruff check .
+          - ruff format --check dynamic_expressions tests
+          - ruff check dynamic_expressions tests
           - deptry .
 
     steps:
