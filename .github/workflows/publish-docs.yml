@@ -17,8 +17,6 @@ jobs:
       GITHUB_ACTIONS_AUTHOR_EMAIL: actions@users.noreply.github.com
 
     steps:
-      - uses: actions/checkout@v4
-
       - name: Setup | Create access token
         uses: actions/create-github-app-token@v2
         id: app-token
@@ -44,7 +42,7 @@ jobs:
           python-version: ${{ env.COMMON_PYTHON_VERSION }}
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v3
+        uses: astral-sh/setup-uv@v6
         with:
           enable-cache: true
 
