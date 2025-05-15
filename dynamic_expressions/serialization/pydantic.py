@@ -1,8 +1,8 @@
 import abc
 from collections.abc import Sequence
-from typing import Any, Literal, Union, overload
+from typing import Annotated, Any, Literal, Union, overload
 
-from pydantic import BaseModel, ConfigDict, TypeAdapter
+from pydantic import BaseModel, BeforeValidator, ConfigDict, TypeAdapter
 
 from dynamic_expressions.nodes import (
     AllOfNode,
@@ -18,6 +18,8 @@ from dynamic_expressions.types import BinaryExpressionOperator
 
 from ._serialization import Serializer
 
+type EnsureTuple[T] = Annotated[tuple[T, ...], BeforeValidator(tuple)]
+
 
 class NodeSchema(BaseModel):
     model_config = ConfigDict(strict=True)
@@ -28,7 +30,7 @@ class NodeSchema(BaseModel):
 
 class AnyOfNodeSchema[T: NodeSchema](NodeSchema):
     type: Literal["any-of"]
-    expressions: tuple[T, ...]
+    expressions: EnsureTuple[T]
 
     def to_node(self) -> AnyOfNode:
         return AnyOfNode(expressions=tuple(expr.to_node() for expr in self.expressions))
@@ -36,7 +38,7 @@ class AnyOfNodeSchema[T: NodeSchema](NodeSchema):
 
 class AllOfNodeSchema[T: NodeSchema](NodeSchema):
     type: Literal["all-of"]
-    expressions: tuple[T, ...]
+    expressions: EnsureTuple[T]
 
     def to_node(self) -> AllOfNode:
         return AllOfNode(expressions=tuple(expr.to_node() for expr in self.expressions))
@@ -66,7 +68,7 @@ class LiteralNodeSchema[T](NodeSchema):
 
 class CoalesceNodeSchema[T: NodeSchema](NodeSchema):
     type: Literal["coalesce"]
-    items: tuple[T, ...]
+    items: EnsureTuple[T]
 
     def to_node(self) -> CoalesceNode:
         return CoalesceNode(items=tuple(item.to_node() for item in self.items))
@@ -86,7 +88,7 @@ class CaseNodeSchema[T: NodeSchema](NodeSchema):
 
 class MatchNodeSchema[T: NodeSchema](NodeSchema):
     type: Literal["match"]
-    cases: tuple[T, ...]
+    cases: EnsureTuple[T]
     default: T | None = None
 
     def to_node(self) -> MatchNode:
