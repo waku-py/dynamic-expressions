@@ -22,7 +22,7 @@ type EnsureTuple[T] = Annotated[tuple[T, ...], BeforeValidator(tuple)]
 
 
 class NodeSchema(BaseModel):
-    model_config = ConfigDict(strict=True)
+    model_config = ConfigDict()
 
     @abc.abstractmethod
     def to_node(self) -> Node: ...
