@@ -1,21 +1,23 @@
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any
-
-from redis.asyncio import Redis
+from datetime import timedelta
+from typing import Any, Protocol
 
 from dynamic_expressions.cache.base import CacheExtension, CachePolicy
 from dynamic_expressions.serialization import Serializer
 from dynamic_expressions.types import EmptyContext
 
-if TYPE_CHECKING:
-    RedisClient = Redis[bytes]
-else:
-    RedisClient = Redis
+
+class RedisClient(Protocol):
+    async def get(self, name: str) -> bytes | None: ...
+    async def set(
+        self,
+        name: str,
+        value: bytes,
+        ex: timedelta | int,
+    ) -> None: ...
 
 
-class RedisCacheExtension[
-    Context: EmptyContext,
-](CacheExtension[Context]):
+class RedisCacheExtension[Context: EmptyContext](CacheExtension[Context]):
     def __init__(
         self,
         client: RedisClient,

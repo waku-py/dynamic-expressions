@@ -62,7 +62,7 @@ exclude_lines = [
 
 [tool.deptry]
 [tool.deptry.per_rule_ignores]
-DEP002 = []
+DEP002 = ["redis"]
 
 [tool.mypy]
 plugins = [

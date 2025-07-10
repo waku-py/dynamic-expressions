@@ -43,14 +43,16 @@ class CacheExtension[
         key = policy.key(node, provided_context)
         serializer = policy.serializer or self.default_serializer
         cached_value = await self.get_cache(key)
+        deserialized_value: object | None = None
         if cached_value is not None:
-            execution_context.cache[node] = serializer.deserialize(cached_value)
+            deserialized_value = serializer.deserialize(cached_value)
+            execution_context.cache[node] = deserialized_value
 
         yield
 
         if (
             node in execution_context.cache
-            and cached_value != execution_context.cache[node]
+            and deserialized_value != execution_context.cache[node]
         ):
             await self.set_cache(
                 key=key,
