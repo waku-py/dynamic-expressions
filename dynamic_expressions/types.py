@@ -26,4 +26,8 @@ BinaryExpressionOperator = Literal[
     "/",
     "//",
     "^",
+    "&",
+    "|",
+    "getitem",
+    "getattr",
 ]

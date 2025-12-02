@@ -28,7 +28,7 @@ class BinaryExpressionNode(Node):
     right: Node
 
 
-@dataclass(slots=True, frozen=True, kw_only=True)
+@dataclass(slots=True, frozen=True)
 class LiteralNode(Node):
     value: Any
 

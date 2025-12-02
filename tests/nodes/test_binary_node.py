@@ -34,3 +34,40 @@ async def test_eq(
 ) -> None:
     node = BinaryExpressionNode(operator="=", left=left, right=right)
     assert await dispatcher.visit(node, None) == (left.value == right.value)
+
+
+@pytest.mark.parametrize(
+    ("left", "right", "expected"),
+    [
+        (0, 63, 0),
+        (5, 4, 4),
+        (8, 4, 0),
+    ],
+)
+async def test_binary_and(
+    dispatcher: VisitorDispatcher[EmptyContext], left: int, right: int, expected: int
+) -> None:
+    node = BinaryExpressionNode(
+        operator="&", left=LiteralNode(left), right=LiteralNode(right)
+    )
+    assert await dispatcher.visit(node, None) == expected == (left & right)
+
+
+@pytest.mark.parametrize(
+    ("left", "right", "expected"),
+    [
+        (pytest, "mark", pytest.mark),
+        (pytest, "mark.parametrize", pytest.mark.parametrize),
+        (pytest, "mark.parametrize.markname", pytest.mark.parametrize.markname),
+    ],
+)
+async def test_getattr(
+    dispatcher: VisitorDispatcher[EmptyContext],
+    left: object,
+    right: str,
+    expected: object,
+) -> None:
+    node = BinaryExpressionNode(
+        operator="getattr", left=LiteralNode(left), right=LiteralNode(right)
+    )
+    assert await dispatcher.visit(node, None) == expected

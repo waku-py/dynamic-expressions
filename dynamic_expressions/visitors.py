@@ -1,6 +1,7 @@
 import abc
 import operator
 from collections.abc import Callable, Mapping
+from functools import reduce
 from typing import Any, ClassVar, Protocol
 
 from dynamic_expressions.nodes import (
@@ -61,9 +62,13 @@ class AllOfVisitor(Visitor[AllOfNode, EmptyContext]):
         return True
 
 
+def _visit_getattr(value: Any, properties: Any) -> object:  # noqa: ANN401
+    return reduce(getattr, properties.split("."), value)
+
+
 class BinaryExpressionVisitor(Visitor[BinaryExpressionNode, EmptyContext]):
     operator_mapping: ClassVar[
-        Mapping[BinaryExpressionOperator, Callable[[Any, Any], bool]]
+        Mapping[BinaryExpressionOperator, Callable[[Any, Any], object]]
     ] = {
         "=": operator.eq,
         ">": operator.gt,
@@ -78,6 +83,10 @@ class BinaryExpressionVisitor(Visitor[BinaryExpressionNode, EmptyContext]):
         "/": operator.truediv,
         "//": operator.floordiv,
         "^": operator.pow,
+        "&": operator.and_,
+        "|": operator.or_,
+        "getitem": operator.getitem,
+        "getattr": _visit_getattr,
     }
 
     async def visit(
@@ -86,7 +95,7 @@ class BinaryExpressionVisitor(Visitor[BinaryExpressionNode, EmptyContext]):
         node: BinaryExpressionNode,
         dispatch: Dispatch[EmptyContext],
         context: EmptyContext,
-    ) -> bool:
+    ) -> object:
         left = await dispatch(node.left, context)
         right = await dispatch(node.right, context)
 
