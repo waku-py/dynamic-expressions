@@ -6,6 +6,7 @@ from typing import Any
 from dynamic_expressions.extensions import (
     OnVisitExtension,
 )
+from dynamic_expressions.middlewares import MiddlewareStack, OnVisitMiddleware
 from dynamic_expressions.nodes import Node
 from dynamic_expressions.types import EmptyContext, ExecutionContext
 from dynamic_expressions.visitors import Visitor
@@ -16,9 +17,11 @@ class VisitorDispatcher[Context: EmptyContext]:
         self,
         visitors: Mapping[type[Node], Visitor[Any, Context]],
         extensions: Sequence[OnVisitExtension[Context]] = (),
+        middlewares: Sequence[OnVisitMiddleware[Context]] = (),
     ) -> None:
         self._visitors = visitors
         self._on_visit_exts = extensions
+        self._middlewares = middlewares
 
     async def visit(
         self,
@@ -52,13 +55,17 @@ class VisitorDispatcher[Context: EmptyContext]:
                 return execution_context.cache[node]
 
             visitor = self._visitors[type(node)]
-            result = await visitor.visit(
-                node=node,
-                context=context,
+            middleware_stack = MiddlewareStack(
+                middlewares=self._middlewares,
+                visitor=visitor,
                 dispatch=functools.partial(
                     self._visit,
                     execution_context=execution_context,
                 ),
+            )
+            result = await middleware_stack.call(
+                node=node,
+                context=context,
             )
             execution_context.cache[node] = result
             return result

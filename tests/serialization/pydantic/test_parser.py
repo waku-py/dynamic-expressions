@@ -46,3 +46,40 @@ def test_parse(parser: PydanticExpressionParser) -> None:
             LiteralNodeSchema(type="literal", value=True),
         ),
     )
+
+
+def test_dump(parser: PydanticExpressionParser) -> None:
+    node = AllOfNodeSchema[Any](
+        type="all-of",
+        expressions=(
+            AnyOfNodeSchema(
+                type="any-of",
+                expressions=(LiteralNodeSchema(type="literal", value=True),),
+            ),
+            LiteralNodeSchema(type="literal", value=True),
+        ),
+    )
+    result = parser.type_adapter.dump_python(
+        node,
+        mode="json",
+        warnings="none",
+    )
+
+    assert result == {
+        "type": "all-of",
+        "expressions": [
+            {
+                "type": "any-of",
+                "expressions": [
+                    {
+                        "type": "literal",
+                        "value": True,
+                    },
+                ],
+            },
+            {
+                "type": "literal",
+                "value": True,
+            },
+        ],
+    }
